@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Publish>
+  <ModId Value="" />
+
+  <DisplayName Value="Tile Locker" />
+
+  <ShortDescription Value="Sell and re-lock map tiles, including recovery from the built-in Unlock Map Tiles option." />
+
+  <LongDescription>
+Tile Locker lets you sell and re-lock map tiles in Cities: Skylines II.
+
+Use the **TL** button in the top-right toolbar to open Tile Locker.
+
+### Sell tiles
+
+Select **Red: SELL**, mark the currently owned tiles you want to sell, and re-lock them.
+
+The tiles are returned to the game's normal map-tile system so they can be purchased again using the normal map tile interface.
+
+### Keep tiles
+
+Select **Purple: KEEP** to mark tiles you want to preserve when recovering a city that was started or loaded using the game's built-in **Unlock Map Tiles** option.
+
+After selecting the tiles you want to keep, open:
+
+**Options → Tile Locker → Recover from built-in Unlock Map Tiles**
+
+Tile Locker will disable the built-in unlock-all state, restore the normal map tile system, re-lock the other tiles, and preserve the tiles you selected.
+
+**WARNING:** Make sure to save a copy of your city before using the recovery function. While testing has not revealed any game-breaking issues, recovery modifies the ownership state of map tiles.
+
+### Save compatibility
+
+Tile Locker works with the game's native MapTile ECS state. The mod does not add custom map-tile entities that your save depends on.
+
+### Credits
+
+Implementation was informed by the Apache-2.0 licensed **FiveTwentyNineTiles** project by algernon.
+  </LongDescription>
+
+  <ModVersion Value="1.0.0" />
+
+  <GameVersion Value="1.6.*" />
+
+  <AccessLevel Value="Private" />
+</Publish>

@@ -1,0 +1,62 @@
+# .NET build output
+bin/
+obj/
+[Bb]uild/
+[Dd]ebug/
+[Rr]elease/
+artifacts/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+# VS Code
+.vscode/
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+
+# Node / UI
+node_modules/
+UI/node_modules/
+UI/dist/
+UI/build/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Cities: Skylines II generated/mod build output
+Publish/
+publish/
+ModPublish/
+UI/types/
+UI/tools/
+UI/webpack.config.js
+UI/tsconfig.json
+UI/README.txt
+UI/package.json
+UI/package-lock.json
+UI/mod.json

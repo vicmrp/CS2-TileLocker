@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <Publish>
-  <ModId Value="" />
+  <ModId Value="156322" />
 
   <DisplayName Value="Tile Locker" />
 
@@ -38,6 +38,9 @@ Tile Locker works with the game's native MapTile ECS state. The mod does not add
 
 Implementation was informed by the Apache-2.0 licensed **FiveTwentyNineTiles** project by algernon.
   </LongDescription>
+
+  <Thumbnail Value="Properties/Thumbnail.png" />
+
 
   <ModVersion Value="1.0.0" />
 

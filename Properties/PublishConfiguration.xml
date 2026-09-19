@@ -37,14 +37,18 @@ Tile Locker works with the game's native MapTile ECS state. The mod does not add
 ### Credits
 
 Implementation was informed by the Apache-2.0 licensed **FiveTwentyNineTiles** project by algernon.
-  </LongDescription>
+  
+UVM compatible: scan this version under Options &gt; Unified Verified Mods. Public source and signed build evidence are available at https://vezit.net. A reproduced build is not a security audit.
+</LongDescription>
 
   <Thumbnail Value="Properties/Thumbnail.png" />
 
 
-  <ModVersion Value="1.0.0" />
+  <ModVersion Value="1.0.1" />
 
   <GameVersion Value="1.6.*" />
 
-  <AccessLevel Value="Private" />
+  <AccessLevel Value="Public" />
+<ChangeLog Value="Adds a deterministic UVM build recipe and public source-to-package verification. Pins the SDK and UI dependencies, removes machine-specific debug paths, and normalizes unsigned native build timestamps. No gameplay behavior changes." />
+<ExternalLink Type="github" Url="https://github.com/vicmrp/CS2-TileLocker" />
 </Publish>

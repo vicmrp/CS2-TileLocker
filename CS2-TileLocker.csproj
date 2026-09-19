@@ -2,6 +2,12 @@
   <PropertyGroup>
     <Configurations>Debug;Release</Configurations>
     <TargetFramework>net48</TargetFramework>
+    <Version>1.0.1</Version>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <PathMap>$(MSBuildProjectDirectory)=/_/source</PathMap>
+    <DebugType Condition="'$(Configuration)'=='Release'">none</DebugType>
+    <DebugSymbols Condition="'$(Configuration)'=='Release'">false</DebugSymbols>
     <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>
     <AssemblyName>CS2-TileLocker</AssemblyName>
@@ -22,7 +28,7 @@
     <Reference Include="Unity.Entities"><Private>false</Private></Reference>
     <Reference Include="Unity.Collections"><Private>false</Private></Reference>
     <Reference Include="Unity.Mathematics"><Private>false</Private></Reference>
-    <Reference Include="Colossal.Mathematics"><HintPath>Library\Colossal.Mathematics.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Colossal.Mathematics"><Private>false</Private></Reference>
     <Reference Include="UnityEngine.CoreModule"><Private>false</Private></Reference>
     <Reference Include="Unity.InputSystem"><Private>false</Private></Reference>
   </ItemGroup>
@@ -33,7 +39,14 @@
     <Reference Update="System.Data"><Private>false</Private></Reference>
   </ItemGroup>
 
-  <Target Name="BuildUI" AfterTargets="AfterBuild">
-    <Exec Command="npm run build" WorkingDirectory="$(ProjectDir)\UI" />
+  <Target Name="ReleasePostProcessorConfig" AfterTargets="ModPostProcessorConfig" Condition="'$(Configuration)'=='Release'">
+    <PropertyGroup><ModPostProcessorArgs>"$(ModPostProcessorFullPath)" PostProcess "$(TargetPath)" -u "$(UnityModProjectFullPath)" @(ReferencePath->'-r "%(Identity)"', ' ') -p Windows</ModPostProcessorArgs></PropertyGroup>
+  </Target>
+  <Target Name="BuildUI" AfterTargets="DeployWIP">
+    <Exec Command="npm ci --no-audit --no-fund" WorkingDirectory="$(ProjectDir)/UI" />
+    <Exec Command="npm run build" WorkingDirectory="$(ProjectDir)/UI" EnvironmentVariables="UVM_UI_OUTPUT=$(DeployDir)" />
+  </Target>
+  <Target Name="NormalizeNativeTimestamp" AfterTargets="RunModPostProcessor" Condition="'$(Configuration)'=='Release'">
+    <Exec Command="node &quot;$(ProjectDir)UI/tools/normalize-native.cjs&quot; &quot;$(OutDir)$(TargetName)_win_x86_64.dll&quot;" />
   </Target>
 </Project>

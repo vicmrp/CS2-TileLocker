@@ -52,11 +52,10 @@ desktop.ini
 Publish/
 publish/
 ModPublish/
-UI/types/
-UI/tools/
-UI/webpack.config.js
-UI/tsconfig.json
 UI/README.txt
-UI/package.json
-UI/package-lock.json
-UI/mod.json
+
+# Generated Unity tooling and private/local build output
+Library/
+artifacts/
+*.p8
+*.dpapi

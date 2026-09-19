@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "platform": "paradox",
+  "modId": "156322",
+  "repository": "https://github.com/vicmrp/CS2-TileLocker",
+  "build": {
+    "project": "CS2-TileLocker.csproj",
+    "configuration": "Release"
+  },
+  "output": [
+    "CS2-TileLocker.dll",
+    "CS2-TileLocker_win_x86_64.dll",
+    "CS2-TileLocker.mjs",
+    "CS2-TileLocker.mjs.LICENSE.txt",
+    "CS2-TileLocker.css"
+  ]
+}

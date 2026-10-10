@@ -124,7 +124,8 @@ namespace CS2_TileLocker
         public override void InitializeRaycast()
         {
             base.InitializeRaycast();
-            // Owned tile hit testing is done from Camera -> MapTile triangles.
+            // Use the active game viewer, including its render scale and camera.
+            m_ToolRaycastSystem.typeMask = TypeMask.Terrain | TypeMask.Water;
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
@@ -242,24 +243,9 @@ namespace CS2_TileLocker
 
         private Entity FindOwnedTileUnderMouse()
         {
-            Mouse mouse = Mouse.current;
-            UnityEngine.Camera camera = UnityEngine.Camera.main;
-
-            if (mouse == null || camera == null)
+            if (!GetRaycastResult(out Entity _, out RaycastHit hit))
                 return Entity.Null;
-
-            UnityEngine.Vector2 mousePos = mouse.position.ReadValue();
-            UnityEngine.Ray ray = camera.ScreenPointToRay(
-                new UnityEngine.Vector3(mousePos.x, mousePos.y, 0f));
-
-            float3 origin =
-                new float3(ray.origin.x, ray.origin.y, ray.origin.z);
-
-            float3 direction = math.normalizesafe(
-                new float3(ray.direction.x, ray.direction.y, ray.direction.z));
-
-            Entity bestEntity = Entity.Null;
-            float bestDistance = float.MaxValue;
+            float2 position = hit.m_HitPosition.xz;
 
             using NativeArray<Entity> tiles =
                 _ownedTileQuery.ToEntityArray(Allocator.Temp);
@@ -280,66 +266,23 @@ namespace CS2_TileLocker
                     Triangle3 triangle =
                         AreaUtils.GetTriangle3(nodes, triangles[i]);
 
-                    if (RayTriangle(
-                        origin,
-                        direction,
-                        triangle.a,
-                        triangle.b,
-                        triangle.c,
-                        out float distance) &&
-                        distance < bestDistance)
-                    {
-                        bestDistance = distance;
-                        bestEntity = tile;
-                    }
+                    if (ContainsPoint(position, triangle.a.xz, triangle.b.xz, triangle.c.xz))
+                        return tile;
                 }
             }
 
-            return bestEntity;
+            return Entity.Null;
         }
 
-        private static bool RayTriangle(
-            float3 origin,
-            float3 direction,
-            float3 v0,
-            float3 v1,
-            float3 v2,
-            out float distance)
+        private static bool ContainsPoint(float2 point, float2 a, float2 b, float2 c)
         {
-            const float epsilon = 0.00001f;
-
-            float3 edge1 = v1 - v0;
-            float3 edge2 = v2 - v0;
-            float3 pvec = math.cross(direction, edge2);
-            float det = math.dot(edge1, pvec);
-
-            if (math.abs(det) < epsilon)
-            {
-                distance = 0f;
-                return false;
-            }
-
-            float invDet = 1f / det;
-            float3 tvec = origin - v0;
-            float u = math.dot(tvec, pvec) * invDet;
-
-            if (u < 0f || u > 1f)
-            {
-                distance = 0f;
-                return false;
-            }
-
-            float3 qvec = math.cross(tvec, edge1);
-            float v = math.dot(direction, qvec) * invDet;
-
-            if (v < 0f || u + v > 1f)
-            {
-                distance = 0f;
-                return false;
-            }
-
-            distance = math.dot(edge2, qvec) * invDet;
-            return distance >= 0f;
+            float Cross(float2 u, float2 v) => u.x * v.y - u.y * v.x;
+            if (math.abs(Cross(b - a, c - a)) < 0.001f) return false;
+            float ab = Cross(b - a, point - a);
+            float bc = Cross(c - b, point - b);
+            float ca = Cross(a - c, point - c);
+            return (ab >= -0.001f && bc >= -0.001f && ca >= -0.001f)
+                || (ab <= 0.001f && bc <= 0.001f && ca <= 0.001f);
         }
 
         private bool IsOwnedMapTile(Entity entity)

@@ -9,6 +9,7 @@ const sellModeActive$ = bindValue<boolean>(group, "sellModeActive", false);
 const keepMode$ = bindValue<boolean>(group, "sellKeepMode", false);
 const selectedCount$ = bindValue<number>(group, "sellSelectedCount", 0);
 const refundAmount$ = bindValue<number>(group, "sellRefundAmount", 0);
+const refundEstimated$ = bindValue<boolean>(group, "sellRefundEstimated", false);
 const canSell$ = bindValue<boolean>(group, "sellCanSell", false);
 const status$ = bindValue<string>(group, "sellStatus", "Ready");
 
@@ -18,6 +19,7 @@ export const SellTiles = () => {
   const keepMode = useValue(keepMode$);
   const selectedCount = useValue(selectedCount$);
   const refundAmount = useValue(refundAmount$);
+  const refundEstimated = useValue(refundEstimated$);
   const canSell = useValue(canSell$);
   const status = useValue(status$);
 
@@ -84,7 +86,7 @@ export const SellTiles = () => {
                 <div className={`tl-help ${keepMode ? "tl-help-purple" : ""}`}>
                   {keepMode
                     ? "Mark the tiles you want to KEEP purple. Then go to Options → Tile Locker → Recover from built-in Unlock Map Tiles. Recovery will re-lock everything, then re-unlock these tiles through vanilla MapTilePurchaseSystem.UnlockTile."
-                    : "Mark owned tiles red. Only the red tiles will be re-locked."}
+                    : "Mark owned tiles red, then sell them to receive a refund. Starting tiles are free and have no refund."}
                 </div>
 
                 <div className="tl-card">
@@ -94,7 +96,7 @@ export const SellTiles = () => {
 
                 {!keepMode && (
                   <div className="tl-card">
-                    <small>Refund</small>
+                    <small>{refundEstimated ? "Refund (includes estimated older purchases)" : "Refund"}</small>
                     <b>₡{Math.max(0, Math.round(refundAmount)).toLocaleString()}</b>
                   </div>
                 )}
@@ -115,7 +117,7 @@ export const SellTiles = () => {
                     onClick={() => trigger(group, "sellSelected")}
                     disabled={!canSell}
                   >
-                    Re-lock selected tiles
+                    Sell selected tiles
                   </button>
                 ) : (
                   <div className="tl-purple-notice">

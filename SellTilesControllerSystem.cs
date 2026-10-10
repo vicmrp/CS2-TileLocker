@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 using Game;
+using Game.Input;
 using UnityEngine.InputSystem;
 
 namespace CS2_TileLocker
@@ -90,7 +91,7 @@ namespace CS2_TileLocker
                 _tool.DeactivateFromController(false);
             }
 
-            if (_tool.IsSellToolActive)
+            if (_tool.IsSellToolActive && !InputManager.instance.mouseOverUI)
             {
                 Mouse mouse = Mouse.current;
                 if (mouse != null && mouse.leftButton.wasPressedThisFrame)
@@ -100,6 +101,13 @@ namespace CS2_TileLocker
             {
                 s_worldClick = false;
             }
+        }
+
+        protected override void OnDestroy()
+        {
+            s_activate = s_deactivate = s_clear = s_sell = s_returnToBuying = false;
+            s_setRedMode = s_setKeepMode = s_worldClick = false;
+            base.OnDestroy();
         }
     }
 }

@@ -4,9 +4,11 @@ using System.IO;
 using System.Text;
 using Colossal.Mathematics;
 using Game.Areas;
+using Game.City;
 using Game.Common;
 using Game.Input;
 using Game.Prefabs;
+using Game.Simulation;
 using Game.Tools;
 using Unity.Collections;
 using Unity.Entities;
@@ -56,6 +58,7 @@ namespace CS2_TileLocker
         internal void SetKeepModeFromController(bool keepMode)
         {
             _keepMode = keepMode;
+            PublishSelection();
 
             // Marks are persistent until the user explicitly presses "Clear marks".
             SellTilesUISystem.Instance?.SetKeepMode(keepMode);
@@ -153,7 +156,8 @@ namespace CS2_TileLocker
             if (!IsSellToolActive)
                 return inputDeps;
 
-            Entity newHover = FindOwnedTileUnderMouse();
+            inputDeps.Complete();
+            Entity newHover = InputManager.instance.mouseOverUI ? Entity.Null : FindOwnedTileUnderMouse();
 
             if (newHover != _hovered)
             {
@@ -220,7 +224,7 @@ namespace CS2_TileLocker
             // the explicit "Clear marks" UI action.
             PublishSelection();
 
-            if (_previousTool != null)
+            if (_previousTool != null && _toolSystem.activeTool == this)
                 _toolSystem.activeTool = _previousTool;
 
             SellTilesUISystem.Instance?.SetMode(false);
@@ -416,6 +420,30 @@ namespace CS2_TileLocker
             int ownedBefore = _ownedTileQuery.CalculateEntityCount();
             int lockedBefore = _lockedTileQuery.CalculateEntityCount();
 
+            Entity city = World.GetOrCreateSystemManaged<CitySystem>().City;
+            if (!EntityManager.HasComponent<PlayerMoney>(city)) return;
+            if (World.GetOrCreateSystemManaged<CityConfigurationSystem>().unlockMapTiles)
+            {
+                SellTilesUISystem.Instance?.SetStatus("Use Recover from built-in Unlock Map Tiles in Options before selling.");
+                return;
+            }
+            var refunds = new Dictionary<Entity, int>();
+            long totalRefund = 0;
+            using (var tiles = _selected.ToNativeArray(Allocator.Temp))
+                foreach (Entity tile in tiles)
+                    if (IsOwnedMapTile(tile))
+                    {
+                        int amount = TileRefunds.Refund(World, tile, ownedBefore, out _);
+                        refunds.Add(tile, amount);
+                        totalRefund += amount;
+                    }
+            var money = EntityManager.GetComponentData<PlayerMoney>(city);
+            if (totalRefund > int.MaxValue || (!money.m_Unlimited && (long)money.money + totalRefund > PlayerMoney.kMaxMoney))
+            {
+                SellTilesUISystem.Instance?.SetStatus("The refund would exceed the city's money limit. Sell fewer tiles or spend money first.");
+                return;
+            }
+
             // FiveTwentyNineTiles always enables the vanilla "Map Tiles" feature
             // before performing a re-lock operation.  Do the same here, using
             // normal ECS/reflection only (no Harmony).
@@ -456,6 +484,17 @@ namespace CS2_TileLocker
                 // Native component that exists on the 520 vanilla locked tiles.
                 EntityManager.AddComponent<Native>(tile);
 
+                // Consume the receipt and credit only a tile whose ownership changed.
+                TileRefunds.Record(EntityManager, tile, 0);
+                if (!money.m_Unlimited)
+                {
+                    money.Add(refunds[tile]);
+                    EntityManager.SetComponentData(city, money);
+                }
+                var starts = World.GetOrCreateSystemManaged<MapTileSystem>().GetStartTiles();
+                for (int i = starts.Length - 1; i >= 0; i--)
+                    if (starts[i] == tile) starts.RemoveAtSwapBack(i);
+
                 // Tell vanilla systems/rendering that the area changed.
                 if (!EntityManager.HasComponent<Updated>(tile))
                     EntityManager.AddComponentData(tile, default(Updated));
@@ -494,14 +533,27 @@ namespace CS2_TileLocker
 
             SellTilesUISystem.Instance?.SetStatus(
                 relocked > 0
-                    ? $"Re-locked {relocked} tile(s): owned={ownedAfter}, locked={lockedAfter}. Wait for verification."
+                    ? $"Sold {relocked} tile(s). Refunded ₡{totalRefund:N0}."
                     : "No valid owned tiles were re-locked.");
         }
 
         private void PublishSelection()
         {
             int count = _selected.IsCreated ? _selected.Count : 0;
-            SellTilesUISystem.Instance?.SetSelectionState(count, 0, count > 0);
+            long refund = 0;
+            bool estimated = false;
+            if (!_keepMode && count > 0)
+            {
+                int owned = _ownedTileQuery.CalculateEntityCount();
+                using (var tiles = _selected.ToNativeArray(Allocator.Temp))
+                    foreach (Entity tile in tiles)
+                        if (IsOwnedMapTile(tile))
+                        {
+                            refund += TileRefunds.Refund(World, tile, owned, out bool legacy);
+                            estimated |= legacy;
+                        }
+            }
+            SellTilesUISystem.Instance?.SetSelectionState(count, (int)Math.Min(refund, int.MaxValue), count > 0 && !_keepMode, estimated);
         }
 
         internal NativeArray<Entity> GetSelectedTiles(Allocator allocator)

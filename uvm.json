@@ -8,6 +8,7 @@
     "configuration": "Release"
   },
   "output": [
+    "0Harmony.dll",
     "CS2-TileLocker.dll",
     "CS2-TileLocker_win_x86_64.dll",
     "CS2-TileLocker.mjs",

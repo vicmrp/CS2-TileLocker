@@ -5,13 +5,15 @@ using Game.Areas;
 using Game.Modding;
 using Game.SceneFlow;
 using Game.Serialization;
+using HarmonyLib;
 
 namespace CS2_TileLocker
 {
     public sealed class Mod : IMod
     {
         public const string ModName = "TileLocker";
-        public const string Version = "1.3.1-locale-build-fix";
+        public const string Version = "1.1.0";
+        private Harmony _harmony;
 
         internal static Mod Instance { get; private set; }
         internal ILog Log { get; private set; }
@@ -22,6 +24,8 @@ namespace CS2_TileLocker
             Instance = this;
             Log = LogManager.GetLogger(ModName);
             Log.Info($"Loading Tile Locker {Version}");
+            _harmony = new Harmony("net.vezit.tilelocker");
+            _harmony.PatchAll(typeof(Mod).Assembly);
 
             Settings = new ModSettings(this);
             Settings.RegisterInOptionsUI();
@@ -44,7 +48,7 @@ namespace CS2_TileLocker
             updateSystem.UpdateAt<VanillaTileModeRepairSystem>(SystemUpdatePhase.GameSimulation);
 
             // Sell Tiles: always-updating request/input controller + custom tool + UI + overlay.
-            updateSystem.UpdateAt<SellTilesControllerSystem>(SystemUpdatePhase.GameSimulation);
+            updateSystem.UpdateBefore<SellTilesControllerSystem, SellTilesToolSystem>(SystemUpdatePhase.ToolUpdate);
             updateSystem.UpdateAt<SellTilesUISystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAt<SellTilesToolSystem>(SystemUpdatePhase.ToolUpdate);
             updateSystem.UpdateAt<SellTilesOverlaySystem>(SystemUpdatePhase.Rendering);
@@ -52,6 +56,7 @@ namespace CS2_TileLocker
 
         public void OnDispose()
         {
+            _harmony?.UnpatchAll("net.vezit.tilelocker");
             Settings?.UnregisterInOptionsUI();
             Instance = null;
         }

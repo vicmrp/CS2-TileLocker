@@ -75,6 +75,7 @@ namespace CS2_TileLocker
 
         public void PostDeserialize(Context context)
         {
+            World.GetOrCreateSystemManaged<SellTilesToolSystem>().ClearRecoverySelection();
             WriteDiagnostic("POST DESERIALIZE", $"purpose={context.purpose}");
             WriteDiagnosticSnapshot("POST DESERIALIZE - BEFORE CHANGES");
 

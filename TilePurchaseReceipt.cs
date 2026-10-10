@@ -41,19 +41,12 @@ namespace CS2_TileLocker
             return Math.Max(0, total);
         }
 
-        internal static int Refund(World world, Entity tile, int ownedCount, out bool estimated)
+        internal static int Refund(EntityManager manager, Entity tile)
         {
-            var manager = world.EntityManager;
-            estimated = false;
+            // Only a recorded payment can be refunded. Old saves have no invoice.
             if (manager.HasComponent<TilePurchaseReceipt>(tile))
                 return Math.Max(0, manager.GetComponentData<TilePurchaseReceipt>(tile).Amount);
-            var starts = world.GetOrCreateSystemManaged<MapTileSystem>().GetStartTiles();
-            for (int i = 0; i < starts.Length; i++) if (starts[i] == tile) return 0;
-            if (world.GetOrCreateSystemManaged<CityConfigurationSystem>().unlockMapTiles) return 0;
-            estimated = true;
-            // Old saves have no invoice. Estimate the price of the most recently
-            // purchased tile using the game's resource cost and ownership multiplier.
-            return (int)Math.Min(2000000000, Math.Round(BaseCost(manager, tile) * Math.Max(0, ownedCount - 1)));
+            return 0;
         }
 
         internal static void Record(EntityManager manager, Entity tile, int amount)

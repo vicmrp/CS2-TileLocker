@@ -12,7 +12,7 @@ namespace CS2_TileLocker
     public sealed class Mod : IMod
     {
         public const string ModName = "TileLocker";
-        public const string Version = "1.1.0";
+        public const string Version = "1.1.1";
         private Harmony _harmony;
 
         internal static Mod Instance { get; private set; }

@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configurations>Debug;Release</Configurations>
     <TargetFramework>net48</TargetFramework>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
     <Deterministic>true</Deterministic>
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     <PathMap>$(MSBuildProjectDirectory)=/_/source</PathMap>

@@ -376,7 +376,7 @@ namespace CS2_TileLocker
                 foreach (Entity tile in tiles)
                     if (IsOwnedMapTile(tile))
                     {
-                        int amount = TileRefunds.Refund(World, tile, ownedBefore, out _);
+                        int amount = TileRefunds.Refund(EntityManager, tile);
                         refunds.Add(tile, amount);
                         totalRefund += amount;
                     }
@@ -484,19 +484,16 @@ namespace CS2_TileLocker
         {
             int count = _selected.IsCreated ? _selected.Count : 0;
             long refund = 0;
-            bool estimated = false;
             if (!_keepMode && count > 0)
             {
-                int owned = _ownedTileQuery.CalculateEntityCount();
                 using (var tiles = _selected.ToNativeArray(Allocator.Temp))
                     foreach (Entity tile in tiles)
                         if (IsOwnedMapTile(tile))
                         {
-                            refund += TileRefunds.Refund(World, tile, owned, out bool legacy);
-                            estimated |= legacy;
+                            refund += TileRefunds.Refund(EntityManager, tile);
                         }
             }
-            SellTilesUISystem.Instance?.SetSelectionState(count, (int)Math.Min(refund, int.MaxValue), count > 0 && !_keepMode, estimated);
+            SellTilesUISystem.Instance?.SetSelectionState(count, (int)Math.Min(refund, int.MaxValue), count > 0 && !_keepMode);
         }
 
         internal NativeArray<Entity> GetSelectedTiles(Allocator allocator)

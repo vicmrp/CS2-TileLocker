@@ -11,7 +11,7 @@ Use the **TL** button in the top-right toolbar to open Tile Locker.
 
 Select **Red: SELL**, mark the currently owned tiles you want to sell, and re-lock them.
 
-Selection and selling work while the game is paused. The panel previews your refund before you select **Sell selected tiles**. Purchases made with version 1.1.0 or later retain their exact paid cost, including batch rounding, in the save. Existing purchases have no recorded invoice and use a clearly labelled estimate based on the game's tile price and current ownership count. Free starting tiles refund nothing. Purchases made with unlimited money refund nothing.
+Selection and selling work while the game is paused. The panel previews your refund before you select **Sell selected tiles**. Only purchases recorded by Tile Locker receive a refund. Purchases made with version 1.1.0 or later retain their exact paid cost, including batch rounding, in the save. Tiles bought before purchase recording was installed have no saved invoice and refund nothing. Free starting tiles and purchases made with unlimited money also refund nothing.
 
 The tiles are returned to the game's normal map-tile system so they can be purchased again using the normal map tile interface.
 
@@ -38,9 +38,9 @@ Implementation was informed by the Apache-2.0 licensed **FiveTwentyNineTiles** p
 UVM compatible: signed build evidence is available at https://uvm.vezit.net. A reproduced build is not a security audit.
 </LongDescription>
   <Thumbnail Value="Properties/Thumbnail.png" />
-  <ModVersion Value="1.1.0" />
+  <ModVersion Value="1.1.1" />
   <GameVersion Value="1.6.*" />
   <AccessLevel Value="Public" />
-  <ChangeLog Value="Fixes tile selection and selling while paused, prevents clicks through UI panels, and refunds sold tiles. New purchases retain their exact paid cost across saves; older purchases show an estimated refund. Includes reproducible UVM evidence at uvm.vezit.net." />
+  <ChangeLog Value="Refunds now apply only to purchases recorded by Tile Locker. Older purchases without a saved invoice refund nothing. Recorded purchases still refund their exact paid cost after saving and reloading. Includes reproducible UVM evidence at uvm.vezit.net." />
   <ExternalLink Type="github" Url="https://github.com/vicmrp/CS2-TileLocker" />
 </Publish>

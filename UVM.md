@@ -1,4 +1,4 @@
-# Reproduce CS2-TileLocker 1.1.0
+# Reproduce CS2-TileLocker 1.1.1
 
 Install the CS2 modding toolchain, .NET SDK 10.0.302, and Node.js/npm. The game references are resolved by the normal CS2 toolchain; do not copy private game DLLs into the source repository.
 

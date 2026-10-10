@@ -11,7 +11,6 @@ namespace CS2_TileLocker
         private ValueBinding<bool> _keepMode;
         private ValueBinding<int> _selectedCount;
         private ValueBinding<int> _refundAmount;
-        private ValueBinding<bool> _refundEstimated;
         private ValueBinding<bool> _canSell;
         private ValueBinding<string> _sellStatus;
 
@@ -27,7 +26,6 @@ namespace CS2_TileLocker
             AddBinding(_keepMode = new ValueBinding<bool>("TileLocker", "sellKeepMode", false));
             AddBinding(_selectedCount = new ValueBinding<int>("TileLocker", "sellSelectedCount", 0));
             AddBinding(_refundAmount = new ValueBinding<int>("TileLocker", "sellRefundAmount", 0));
-            AddBinding(_refundEstimated = new ValueBinding<bool>("TileLocker", "sellRefundEstimated", false));
             AddBinding(_canSell = new ValueBinding<bool>("TileLocker", "sellCanSell", false));
             AddBinding(_sellStatus = new ValueBinding<string>("TileLocker", "sellStatus", "Ready"));
 
@@ -101,11 +99,10 @@ namespace CS2_TileLocker
             SellTilesControllerSystem.RequestReturnToBuying();
         }
 
-        internal void SetSelectionState(int count, int refund, bool canSell, bool estimated = false)
+        internal void SetSelectionState(int count, int refund, bool canSell)
         {
             _selectedCount.Update(count);
             _refundAmount.Update(refund);
-            _refundEstimated.Update(estimated);
             _canSell.Update(canSell);
         }
 
